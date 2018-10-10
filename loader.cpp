@@ -1,8 +1,9 @@
 #include <iostream>
+#include <fstream>
 #include <sstream>
 #include <string>
 #include <vector>
-#include "loader.h"
+#include "loader.hpp"
 
 
 using namespace std;
@@ -77,7 +78,7 @@ frequency_data_loader::load_frequency_file(string freqfile_path)
 
 
 bool
-frequency_data_loader::load_prefix_frequencies(ifstream input_stream)
+frequency_data_loader::load_prefix_frequencies(ifstream& input_stream)
 {
 	string tag;
 	int n_items;
@@ -96,7 +97,7 @@ frequency_data_loader::load_prefix_frequencies(ifstream input_stream)
 			return false;
 		freqs.push_back(freq);
 	}
-	if (!(input_stream >> line) || line != "END")
+	if (!(input_stream >> tag) || tag != "END")
 		return false;
 
 	prefix_strings = items;
@@ -105,6 +106,7 @@ frequency_data_loader::load_prefix_frequencies(ifstream input_stream)
 }
 
 
+#if 0
 static frequency
 stol(string num)
 {
@@ -113,10 +115,11 @@ stol(string num)
 	ss >> cap;
 	return cap;
 }
+#endif
 
 
 static bool
-read_char_freq_line(ifstream input_stream, vector<char>& chars,
+read_char_freq_line(ifstream& input_stream, vector<char>& chars,
 		    vector<frequency>& freqs)
 {
 	int n_pairs;
@@ -126,7 +129,7 @@ read_char_freq_line(ifstream input_stream, vector<char>& chars,
 	for (int i=0; i<n_pairs; i++) {
 		int delim_idx;
 		unsigned char repchar;
-		frequency freq;
+		frequency repfreq;
 		if (!(input_stream >> pair))
 			return false;
 		if ((delim_idx = pair.find(':')) < 0)
@@ -142,7 +145,7 @@ read_char_freq_line(ifstream input_stream, vector<char>& chars,
 
 
 bool
-frequency_data_loader::load_leadingchar_frequencies(ifstream input_stream)
+frequency_data_loader::load_leadingchar_frequencies(ifstream& input_stream)
 {
 	string tag;
 	int n_items;
@@ -167,7 +170,7 @@ frequency_data_loader::load_leadingchar_frequencies(ifstream input_stream)
 
 
 bool
-frequency_data_loader::load_normalchar_frequencies(ifstream input_stream)
+frequency_data_loader::load_normalchar_frequencies(ifstream& input_stream)
 {
 	string tag;
 	int n_items;
@@ -192,7 +195,7 @@ frequency_data_loader::load_normalchar_frequencies(ifstream input_stream)
 
 
 bool
-frequency_data_loader::load_suffix_frequencies(ifstream input_stream)
+frequency_data_loader::load_suffix_frequencies(ifstream& input_stream)
 {
 	string tag;
 	int n_items;
@@ -211,10 +214,10 @@ frequency_data_loader::load_suffix_frequencies(ifstream input_stream)
 			return false;
 		freqs.push_back(freq);
 	}
-	if (!(input_stream >> line) || line != "END")
+	if (!(input_stream >> tag) || tag != "END")
 		return false;
 
-	suffix_strings = items;
-	suffix_frequencies = freqs;
+	this->suffix_strings = items;
+	this->suffix_frequencies = freqs;
 	return true;
 }

@@ -1,10 +1,11 @@
-#include <iostream>
-#include <string>
 #include <vector>
+#include <string>
+#include <cstring>
+#include <iostream>
 #include "loader.hpp"
 #include "event_iterator.hpp"
 
-#define FREQDATA_DEFAULT_PATH "/usr/share/mutator/mt_freqdata.frq"
+#define FREQDATA_DEFAULT_PATH ((char*)("/usr/share/mutator/mt_freqdata.frq"))
 
 
 using namespace std;
@@ -18,7 +19,7 @@ struct ev_data {
 	int n_events;
 	vector<string> prefixes, suffixes;
 	vector<char> leadingchar_replacements;
-	vector<vector<char>> normalchar_replacements;
+	vector<vector<char>> normal_replacements;
 };
 
 
@@ -31,11 +32,11 @@ static void event_iteration_cb(const vector<int>& outcomes, void *cb_data)
 	cout << "\n";
 #endif
 	struct ev_data *data = (struct ev_data*)cb_data;
-	cout << data.prefixes[outcomes[0]];
-	data.seed[0] = data.leadingchar_replacements[outcomes[1]];
-	for (int i=2; i<data.n_events-1; i++)
-		data.seed[i-1] = data.normalchar_replacements[i][outcomes[i]];
-	cout << data << data.suffixes[outcomes[data.n_events-1]] << endl;
+	cout << data->prefixes[outcomes[0]];
+	data->seed[0] = data->leadingchar_replacements[outcomes[1]];
+	for (int i=2; i<data->n_events-1; i++)
+		data->seed[i-1] = data->normal_replacements[i][outcomes[i]];
+	cout << data << data->suffixes[outcomes[data->n_events-1]] << endl;
 }
 
 
@@ -99,7 +100,7 @@ int main(int argc, char *argv[])
 			event_indices.push_back(j);
 		ev_list->set_event_sample_space(i+1, event_indices,
 						outcome_freqs);
-		cb_data.normalchar_replacements.push_back(replacements);
+		cb_data.normal_replacements.push_back(replacements);
 	}
 
 	// Suffix events
@@ -111,7 +112,7 @@ int main(int argc, char *argv[])
 					outcome_freqs);
 
 	// Main iteration
-	ev_list.iterate_sorted(event_iteration_cb, &cb_data);
+	ev_list->iterate_sorted(event_iteration_cb, &cb_data);
 
 	delete ev_list;
 	return 0;

@@ -2,6 +2,7 @@
 #define LOADER_H
 
 #include <iostream>
+#include <fstream>
 #include <string>
 #include <vector>
 
@@ -26,13 +27,13 @@ class frequency_data_loader {
 	vector<char> normal_replacement_chars[256];
 	vector<frequency> normal_replacement_frequencies[256];
 	// Vectors of suffixes and their frequencies
-	vector<string> prefix_strings;
-	vector<frequency> prefix_frequencies;
+	vector<string> suffix_strings;
+	vector<frequency> suffix_frequencies;
 	// Loaders:
-	bool load_prefix_frequencies(ifstream input_stream);
-	bool load_leadingchar_frequencies(ifstream input_stream);
-	bool load_normalchar_frequencies(ifstream input_stream);
-	bool load_suffix_frequencies(ifstream input_stream);
+	bool load_prefix_frequencies(ifstream& input_stream);
+	bool load_leadingchar_frequencies(ifstream& input_stream);
+	bool load_normalchar_frequencies(ifstream& input_stream);
+	bool load_suffix_frequencies(ifstream& input_stream);
 	public:
 	bool load_frequency_file(string freqfile_path);
 	void get_prefix_frequencies(vector<string>& prefixes,
