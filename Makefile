@@ -1,8 +1,10 @@
 
-SOURCE_FILES := event_iterator.cpp
+SOURCE_FILES := event_iterator.cpp loader.cpp
 CFLAGS :=
 
+mutator:
+	$(CXX) $(CFLAGS) -o mutator mutator.cpp $(SOURCE_FILES)
 test:
 	$(CXX) $(CFLAGS) -o test test.cpp $(SOURCE_FILES)
 clean:
-	rm -rf test
+	rm -rf test mutator
