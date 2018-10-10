@@ -37,9 +37,11 @@ class frequency_data_loader {
 	bool load_frequency_file(string freqfile_path);
 	void get_prefix_frequencies(vector<string>& prefixes,
 				    vector<frequency>& freqs);
-	void get_leadingchar_frequencies(vector<char>& leadingchars,
+	void get_leadingchar_frequencies(unsigned char leadingchar,
+					 vector<char>& leadingchars,
 					 vector<frequency>& freqs);
-	void get_normalchar_frequencies(vector<char>& normalchars,
+	void get_normalchar_frequencies(unsigned char normalchar,
+					vector<char>& normalchars,
 					vector<frequency>& freqs);
 	void get_suffix_frequencies(vector<string>& suffixes,
 				    vector<frequency>& freqs);
