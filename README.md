@@ -9,12 +9,12 @@ make clean && make mutator
 
 After compilation invoke with:
 ```
-./mutator \<seed text\> \[\<optional custom frequency data\>\]
+./mutator <seed text> [<optional custom path to frequency data>]
 ```
 
 ## Generating custom frequency data
-Frequency data is generated from a list of passwords and a list of words that
-some of the passwords are derived from.
+Frequency data is generated from a list of passwords and a list of words
+that some of the passwords are derived from.
 
 Compilation:
 ```
@@ -22,7 +22,8 @@ cd freqdata-generator/
 make clean && make
 ```
 
-After the generator is compiled supply the passwords and wordlist file with:
+After the generator is compiled supply the passwords and wordlist file as
+follows:
 ```
 cat passwords | ./generator wordlist > your_output_file
 ```
