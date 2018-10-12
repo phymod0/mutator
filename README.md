@@ -1,5 +1,5 @@
-# mutator
-Prints passwords derived from a given text
+### mutator
+Print passwords derived from a given text in order of likelihood
 
 # Usage:
 ./mutator \<seed text\> \[\<optional custom frequency data\>\]
