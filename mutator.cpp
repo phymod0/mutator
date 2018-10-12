@@ -32,11 +32,12 @@ static void event_iteration_cb(const vector<int>& outcomes, void *cb_data)
 	cout << "\n";
 #endif
 	struct ev_data *data = (struct ev_data*)cb_data;
-	cout << data->prefixes[outcomes[0]];
 	data->seed[0] = data->leadingchar_replacements[outcomes[1]];
 	for (int i=2; i<data->n_events-1; i++)
-		data->seed[i-1] = data->normal_replacements[i][outcomes[i]];
-	cout << data << data->suffixes[outcomes[data->n_events-1]] << endl;
+		data->seed[i-1] = data->normal_replacements[i-2][outcomes[i]];
+	cout << data->prefixes[outcomes[0]];
+	cout << data->seed;
+	cout << data->suffixes[outcomes[data->n_events-1]] << endl;
 }
 
 
@@ -61,9 +62,7 @@ int main(int argc, char *argv[])
 
 	if (!loader.load_frequency_file(freq_file)) {
 		cerr << "No frequency data loaded from " << freq_file << "\n";
-		if (argc == 2)
-			cerr << "Frequency data missing...\n";
-		cerr << "Exiting...\n";
+		cerr << "Frequency data missing or corrupt...\n";
 		return -1;
 	}
 

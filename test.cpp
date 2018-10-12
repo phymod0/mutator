@@ -1,5 +1,6 @@
 #include <iostream>
 #include <vector>
+#include "loader.hpp"
 #include "event_iterator.hpp"
 
 
@@ -15,17 +16,17 @@ static void event_iteration_cb(const vector<int>& outcomes, void *cb_data)
 }
 
 
+/* TODO: Test loader.cpp for file reading errors */
 int main(int argc, char *argv[])
 {
-	event_list ev_list(3);
-	ev_list.set_event_sample_space(0, vector<int>({1, 2, 3, 4}),
-			vector<unsigned long long>({100, 100, 100, 100}));
-	ev_list.set_event_sample_space(1, vector<int>({5, 6}),
-			vector<unsigned long long>({75, 25}));
-	ev_list.set_event_sample_space(2, vector<int>({7, 8, 9}),
-			vector<unsigned long long>({80, 80, 640}));
+	frequency_data_loader loader;
+	if (!loader.load_frequency_file("outfile")) {
+		cerr << "Failed to load file!\n";
+		return -1;
+	}
 
-	ev_list.iterate_sorted(event_iteration_cb, NULL);
+	
 
+	cout << "Exiting with return value " << 0 << "\n";
 	return 0;
 }

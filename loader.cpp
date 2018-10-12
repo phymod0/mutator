@@ -3,6 +3,7 @@
 #include <sstream>
 #include <string>
 #include <vector>
+#include <stdio.h>
 #include "loader.hpp"
 
 
@@ -57,15 +58,16 @@ frequency_data_loader::load_frequency_file(string freqfile_path)
 		return false;
 	}
 
+	bool ret = true;
 	while (input_stream >> section) {
-		if (section == "Prefixes:")
-			load_prefix_frequencies(input_stream);
-		else if (section == "Leading characters:")
-			load_leadingchar_frequencies(input_stream);
-		else if (section == "Normal characters:")
-			load_normalchar_frequencies(input_stream);
-		else if (section == "Suffixes:")
-			load_suffix_frequencies(input_stream);
+		if (section == ":prefix:")
+			ret = ret && load_prefix_frequencies(input_stream);
+		else if (section == ":leading:")
+			ret = ret && load_leadingchar_frequencies(input_stream);
+		else if (section == ":normal:")
+			ret = ret && load_normalchar_frequencies(input_stream);
+		else if (section == ":suffix:")
+			ret = ret && load_suffix_frequencies(input_stream);
 		else {
 			cerr << "Error: Section \"" << section
 			     << "\" not supported..." << endl;
@@ -73,7 +75,7 @@ frequency_data_loader::load_frequency_file(string freqfile_path)
 		}
 	}
 
-	return true;
+	return ret;
 }
 
 
@@ -85,20 +87,28 @@ frequency_data_loader::load_prefix_frequencies(ifstream& input_stream)
 	vector<string> items;
 	vector<frequency> freqs;
 
-	if (!(input_stream >> tag >> n_items) || tag != "START")
+	if (!(input_stream >> tag >> n_items) || tag != "START") {
+		cerr << __func__ << ": Corrupt start tag...\n";
 		return false;
+	}
 	for (int i=0; i<n_items; i++) {
 		string prefix;
 		frequency freq;
-		if (!(input_stream >> prefix))
+		if (!(input_stream >> prefix)) {
+			cerr << __func__ << ": Corrupt entry prefix...\n";
 			return false;
-		items.push_back(prefix);
-		if (!(input_stream >> freq))
+		}
+		items.push_back(prefix.substr(1));
+		if (!(input_stream >> freq)) {
+			cerr << __func__ << ": Corrupt entry frequency...\n";
 			return false;
+		}
 		freqs.push_back(freq);
 	}
-	if (!(input_stream >> tag) || tag != "END")
+	if (!(input_stream >> tag) || tag != "END") {
+		cerr << __func__ << ": Corrupt end tag...\n";
 		return false;
+	}
 
 	prefix_strings = items;
 	prefix_frequencies = freqs;
@@ -123,17 +133,23 @@ read_char_freq_line(ifstream& input_stream, vector<char>& chars,
 		    vector<frequency>& freqs)
 {
 	int n_pairs;
-	string pair;
-	if (!(input_stream >> n_pairs))
+	if (!(input_stream >> n_pairs)) {
+		cerr << __func__ << ": Corrupt entry...\n";
 		return false;
+	}
 	for (int i=0; i<n_pairs; i++) {
+		string pair;
 		int delim_idx;
 		unsigned char repchar;
 		frequency repfreq;
-		if (!(input_stream >> pair))
+		if (!(input_stream >> pair)) {
+			cerr << __func__ << ": Bad entry count...\n";
 			return false;
-		if ((delim_idx = pair.find(':')) < 0)
+		}
+		if ((delim_idx = pair.find(':')) < 0) {
+			cerr << __func__ << ": Corrupt entry...\n";
 			return false;
+		}
 		repchar = (unsigned char)(int)stoi(pair.substr(0, delim_idx));
 		repfreq = (frequency)stol(pair.substr(delim_idx + 1));
 		chars.push_back((char)repchar);
@@ -150,10 +166,14 @@ frequency_data_loader::load_leadingchar_frequencies(ifstream& input_stream)
 	string tag;
 	int n_items;
 
-	if (!(input_stream >> tag >> n_items))
+	if (!(input_stream >> tag >> n_items)) {
+		cerr << __func__ << ": Corrupt start tag...\n";
 		return false;
-	if (tag != "START" || n_items != 256)
+	}
+	if (tag != "START" || n_items != 256) {
+		cerr << __func__ << ": Corrupt start tag...\n";
 		return false;
+	}
 
 	for (int i=0; i<n_items; i++) {
 		vector<char> chars;
@@ -162,8 +182,10 @@ frequency_data_loader::load_leadingchar_frequencies(ifstream& input_stream)
 		leading_replacement_chars[i] = chars;
 		leading_replacement_frequencies[i] = freqs;
 	}
-	if (!(input_stream >> tag) || tag != "END")
+	if (!(input_stream >> tag) || tag != "END") {
+		cerr << __func__ << ": Corrupt end tag...\n";
 		return false;
+	}
 
 	return true;
 }
@@ -175,10 +197,14 @@ frequency_data_loader::load_normalchar_frequencies(ifstream& input_stream)
 	string tag;
 	int n_items;
 
-	if (!(input_stream >> tag >> n_items))
+	if (!(input_stream >> tag >> n_items)) {
+		cerr << __func__ << ": Corrupt start tag...\n";
 		return false;
-	if (tag != "START" || n_items != 256)
+	}
+	if (tag != "START" || n_items != 256) {
+		cerr << __func__ << ": Corrupt start tag...\n";
 		return false;
+	}
 
 	for (int i=0; i<n_items; i++) {
 		vector<char> chars;
@@ -187,8 +213,10 @@ frequency_data_loader::load_normalchar_frequencies(ifstream& input_stream)
 		normal_replacement_chars[i] = chars;
 		normal_replacement_frequencies[i] = freqs;
 	}
-	if (!(input_stream >> tag) || tag != "END")
+	if (!(input_stream >> tag) || tag != "END") {
+		cerr << __func__ << ": Corrupt end tag...\n";
 		return false;
+	}
 
 	return true;
 }
@@ -202,20 +230,28 @@ frequency_data_loader::load_suffix_frequencies(ifstream& input_stream)
 	vector<string> items;
 	vector<frequency> freqs;
 
-	if (!(input_stream >> tag >> n_items) || tag != "START")
+	if (!(input_stream >> tag >> n_items) || tag != "START") {
+		cerr << __func__ << ": Corrupt start tag...\n";
 		return false;
+	}
 	for (int i=0; i<n_items; i++) {
 		string suffix;
 		frequency freq;
-		if (!(input_stream >> suffix))
+		if (!(input_stream >> suffix)) {
+			cerr << __func__ << ": Corrupt entry prefix...\n";
 			return false;
-		items.push_back(suffix);
-		if (!(input_stream >> freq))
+		}
+		items.push_back(suffix.substr(1));
+		if (!(input_stream >> freq)) {
+			cerr << __func__ << ": Corrupt entry frequency...\n";
 			return false;
+		}
 		freqs.push_back(freq);
 	}
-	if (!(input_stream >> tag) || tag != "END")
+	if (!(input_stream >> tag) || tag != "END") {
+		cerr << __func__ << ": Corrupt end tag...\n";
 		return false;
+	}
 
 	this->suffix_strings = items;
 	this->suffix_frequencies = freqs;
